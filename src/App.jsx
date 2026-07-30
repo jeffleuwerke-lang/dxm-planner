@@ -841,7 +841,6 @@ const miniInputStyle = {
 };
 const sectionHeader = {
   fontFamily:"monospace", fontSize:10, fontWeight:700, color:"#5F5E5A", textTransform:"uppercase", letterSpacing:"0.12em",
-  letterSpacing:"0.12em",
   borderBottom:"0.5px solid #D3D1C7", paddingBottom:6, marginBottom:12,
 };
 const btnStyle = {
@@ -1255,7 +1254,7 @@ export default function App() {
         <div style={{ padding:"8px 8px 0" }}>
           {NAV_TABS.map(t => (
             <div key={t.id} onClick={()=>setTab(t.id)} style={{
-              padding:"7px 10px", borderRadius:5, cursor:"pointer", fontSize:12,
+              padding:"7px 10px", cursor:"pointer", fontSize:12,
               color: tab===t.id ? "#000000" : "#888780",
               background: tab===t.id ? "#FAEEDA" : "transparent", borderLeft: tab===t.id ? "2px solid #FFD600" : "2px solid transparent", borderRadius: tab===t.id ? 0 : 4,
               marginBottom:2, transition:"all 0.1s",
@@ -1377,7 +1376,7 @@ export default function App() {
 
       {/* ── Main content ── */}
       <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
-        <div style={{ padding:"12px 20px", borderBottom:"0.5px solid #D3D1C7",
+        <div style={{ padding:"12px 20px",
           background:"#000000", borderBottom:"3px solid #FFD600",
           display:"flex", alignItems:"center", gap:12 }}>
           <div style={{ flex:1 }}>
