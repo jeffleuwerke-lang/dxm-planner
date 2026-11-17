@@ -1,0 +1,110 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Modd xmlns="http://www.bannerengineering.com/MODD_v1.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		copyright="Copyright 2023 Banner Engineering Corp. All Rights Reserved."
+		timestamp="2023-01-03T18:03:00"
+		filename="S15S-R500-MQ_MODD.xml"
+		revision="1.0.0.0"
+		author="sfoley">
+
+    <icon Name="icon" description="image for this device" filename="nameofimage.png" />
+    
+    <deviceids>
+        <deviceid val="815392" type="unsignedint"/>
+    </deviceids>
+    
+    <deviceinfo>
+        <category cat="something" />
+        <shortdesc desc="short description" />
+        <longdesc desc="a longer description" />
+    </deviceinfo>
+    
+    <settings >
+        <deviceheader>
+            <devicehdritem id="baudrate" name="Baud Rate" val="1" default="1" modbusAddr="40601" numregs="1" datatype="unsignedbyte" accessRights="rw" accesslevel="all">
+                <singlevalue val="0" text="9600" />
+                <singlevalue val="1" text="19200" />
+                <singlevalue val="2" text="38400" />
+            </devicehdritem>
+            <devicehdritem id="parity" name="Parity" val="0" default="0" modbusAddr="40602" numregs="1" datatype="unsignedbyte" accessRights="rw" accesslevel="all">
+                <singlevalue val="0" text="None" />
+                <singlevalue val="1" text="Odd" />
+                <singlevalue val="2" text="Even" />
+            </devicehdritem>
+            <devicehdritem id="SID" name="SID" val="1" default="1" minVal="1" maxVal="247" modbusAddr="40603" numregs="1" datatype="unsignedbyte" accessRights="rw" accesslevel="all"/>
+            <devicehdritem id="factoryreset" name="Factory Reset" val="0" default="0" modbusAddr="40605" numregs="1" datatype="unsignedbyte" accessRights="rw" accesslevel="all">
+                <singlevalue val="0" text="No Operation" />
+                <singlevalue val="1" text="Restore" />
+            </devicehdritem>
+            <devicehdritem id="bannername" name="Banner Name" modbusAddr="40606" numregs="10" datatype="string" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="productname" name="Product Name" modbusAddr="40616" numregs="16" datatype="string" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="itemnumber" name="Item Number" modbusAddr="40632" numregs="2" datatype="unsignedint" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="serialnumber" name="Serial Number" modbusAddr="40634" numregs="4" datatype="unsignedint" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="firmwarePN" name="Firmware PN" modbusAddr="40638" numregs="2" datatype="unsignedint" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="firmwarevers" name="Firmware Vers" modbusAddr="40640" numregs="2" datatype="unsignedint" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="firmwarebuildnum" name="Firmware Build Num" modbusAddr="40642" numregs="2" datatype="unsignedint" accessRights="ro" accesslevel="all" />
+            <devicehdritem id="usertag" name="User Tag" modbusAddr="40644" numregs="16" datatype="string" accessRights="rw" accesslevel="all"/>        
+        </deviceheader>
+    </settings>
+
+    <dataitems>
+        <dataitem id="current" name="Current" modbusAddr="40001" accessRights="ro" Description="Current (A)" endian="big" maxVal="32768" minVal="0" scale=".01" datatype="unsignedint" units="A" unitLocale="" numregs="1" bitlength="16" bitposition="0" accesslevel="all" format="decimal:2"/>
+        <dataitem id="alarmstateio1" name="Alarm State" modbusAddr="40002" accessRights="ro" Description="Alarm State for IO 1" endian="big" maxVal="1" minVal="0" scale="1" datatype="unsignedint" unitLocale="" numregs="1" bitlength="16" bitposition="0" accesslevel="all" format="">
+            <singlevalue val="0" text="Within threshold range"/>
+            <singlevalue val="1" text="Out of threshold range" />
+        </dataitem>
+        <dataitem id="progstatus" name="Program Status" modbusAddr="40003" accessRights="ro" Description="Program Status" endian="big" maxVal="2" minVal="0" scale="1" datatype="unsignedint" unitLocale="" numregs="1" bitlength="16" bitposition="0" accesslevel="all" format="">
+            <singlevalue val="0" text="STATUS_ERROR_TYPE_NO_ERROR"/>
+            <singlevalue val="1" text="STATUS_ERROR_TYPE_BELOW_MIN"/>
+            <singlevalue val="2" text="STATUS_ERROR_TYPE_ABOVE_MAX"/>
+        </dataitem>
+        <dataitem id="sampintervaltime" name="Sample Interval" modbusAddr="41201" accessRights="rw" Description="Sample Interval Time" endian="big" maxVal="65535" minVal="0" scale="62.5" datatype="unsignedint" units="ms" unitLocale="" numregs="1" bitlength="16" bitposition="0" accesslevel="all" format="" />
+        <dataitem id="minvalue" name="Minimum Value" modbusAddr="41204" accessRights="rw" Description="Minimum Analog Value" endian="big" maxVal="655" minVal="0" scale="1" datatype="unsignedint" units="A" unitLocale="" numregs="1" bitlength="16" bitposition="0" accesslevel="all" format="">
+        </dataitem>
+        <dataitem id="maxvalue" name="Maximum Value" modbusAddr="41205" accessRights="rw" Description="Maximum Analog Value" endian="big" maxVal="655" minVal="0" scale="1" datatype="unsignedint" units="A" unitLocale="" numregs="1" bitlength="16" bitposition="0" accesslevel="all" format="">
+        </dataitem>
+        <dataitem id="acfreq" name="AC Line Freq" modbusAddr="41011" accessRights="rw" Description="AC Line Frequency" endian="big" maxVal="2" minVal="1" scale="1" datatype="unsignedint" units="Hz" unitLocale="" numregs="1" bitlength="16" bitposition="0" accesslevel="all" >
+            <singlevalue val="1" text="60 Hz"/>
+            <singlevalue val="2" text="50 Hz" />
+        </dataitem>
+        <dataitem id="ampval" name="AmpValue" modbusAddr="41015" accessRights="rw" Description="Amp Value of Transformer" endian="big" maxVal="655" minVal="0" scale="1" datatype="unsignedint" units="A" unitLocale="" numregs="1" bitlength="16" bitposition="0" accesslevel="all" format="decimal:2">
+        </dataitem>
+    </dataitems>
+
+    <uielements>
+        <uielement name="currentgraph" type="graph" Title="Time vs. Value">
+            <xaxis Title="Time">
+                <options>
+                    <option val="time" />
+                </options>
+            </xaxis>
+            <yaxis Title="Value">
+                <options>
+                    <option val="current"/>
+                </options>
+                <option val="current"/>
+
+            </yaxis>
+            <input val="current"/>
+
+        </uielement>
+
+        <uielement name="Table1" type="table">
+            <input val="current"/>
+
+        </uielement>
+    </uielements>
+
+    <demo>
+        <uielements>
+            <uielement type="graph" Title="Time vs. Current">
+                <xaxis Title="Time">
+                    <series val="time" />
+                </xaxis>
+                <yaxis Title="Current">
+                    <series val="current" />
+                </yaxis>
+            </uielement>
+        </uielements>
+    </demo>
+</Modd>

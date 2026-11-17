@@ -1,0 +1,225 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Modd xmlns="http://www.bannerengineering.com/MODD_v1.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		copyright="Copyright 2023 Banner Engineering Corp. All Rights Reserved."
+		timestamp="2018-07-10T13:03:00"
+		filename="S15C-B22-MQ_MODD.xml"
+		revision="1.0.0.0"
+		author="SFoley">
+
+    <icon Name="icon" description="image for this device" filename="nameofimage.png" />
+    <deviceids>
+        <deviceid val="812234" type="unsignedint"/>
+    </deviceids>
+
+   <settings >
+        <deviceheader>
+            <devicehdritem id="baudrate" name="Baud Rate" val="1" default="1" modbusAddr="40601" numregs="1" datatype="unsignedbyte" accessRights="rw" accesslevel="all">
+                <singlevalue val="0" text="9600" />
+                <singlevalue val="1" text="19200" />
+                <singlevalue val="2" text="38400" />
+            </devicehdritem>
+            <devicehdritem id="parity" name="Parity" val="0" default="0" modbusAddr="40602" numregs="1" datatype="unsignedbyte" accessRights="rw" accesslevel="all">
+                <singlevalue val="0" text="None" />
+                <singlevalue val="1" text="Odd" />
+                <singlevalue val="2" text="Even" />
+            </devicehdritem>
+            <devicehdritem id="SID" name="SID" val="1" default="1" minVal="1" maxVal="247" modbusAddr="40603" numregs="1" datatype="unsignedbyte" accessRights="rw" accesslevel="all"/>
+            <devicehdritem id="factoryreset" name="Factory Reset" val="0" default="0" modbusAddr="40605" numregs="1" datatype="unsignedbyte" accessRights="wo" accesslevel="all">
+                <singlevalue val="0" text="No Operation" />
+                <singlevalue val="1" text="Restore" />
+            </devicehdritem>
+            <devicehdritem id="bannername" name="Banner Name" modbusAddr="40606" numregs="10" datatype="string" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="productname" name="Product Name" modbusAddr="40616" numregs="16" datatype="string" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="itemnumber" name="Item Number" modbusAddr="40632" numregs="2" datatype="unsignedint" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="serialnumber" name="Serial Number" modbusAddr="40634" numregs="4" datatype="unsignedint" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="firmwarePN" name="Firmware PN" modbusAddr="40638" numregs="2" datatype="unsignedint" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="firmwarevers" name="Firmware Vers" modbusAddr="40640" numregs="2" datatype="unsignedint" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="firmwarebuildnum" name="Firmware Build Num" modbusAddr="40642" numregs="2" datatype="unsignedint" accessRights="ro" accesslevel="all" />
+            <devicehdritem id="usertag" name="User Tag" modbusAddr="40644" numregs="16" datatype="string" accessRights="rw" accesslevel="all"/>
+        </deviceheader>
+    </settings>
+    
+    <dataitems>
+	
+	<!--Table 1 Measurement Reads-->
+        <dataitem id="pin4activestate" name="Pin 4 Active State" modbusAddr="40001" accessRights="ro" Description="Pin 4 Active State" maxVal="1" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format=""/>
+        <dataitem id="pin2activestate" name="Pin 2 Active State" modbusAddr="40002" accessRights="ro" Description=" Pin 2 Active State" maxVal="1" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format=""/>
+
+        <dataitem id="pin4count" name="Pin 4 Count" modbusAddr="40003" accessRights="ro" Description="Pin 4 Count" maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="2" bitlength="32" appliesTo="" accesslevel="all" format=""/>
+        <dataitem id="pin4duration" name="Pin 4 Duration" modbusAddr="40005" accessRights="ro" Description="Pin 4 Duration Value" maxVal="65535" minVal="0" scale="1" units="us" datatype="unsignedint" numregs="2" bitlength="32" appliesTo="" accesslevel="all" format=""/>
+        <dataitem id="pin4eventsperminute" name="Pin 4 Events per Minute" modbusAddr="40007" accessRights="ro" Description="Pin 4 Events per Minute" maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="2" bitlength="32" appliesTo="" accesslevel="all" format=""/>
+        <dataitem id="pin4totalizercount" name="Pin 4 Totalizer Count" modbusAddr="40009" accessRights="ro" Description="Pin 4 Totalizer Count" maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="2" bitlength="32" appliesTo="" accesslevel="all" format=""/>
+
+        <dataitem id="pin2count" name="Pin 2 Count" modbusAddr="40011" accessRights="ro" Description="Pin 2 Count" maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="2" bitlength="32" appliesTo="" accesslevel="all" format=""/>
+        <dataitem id="pin2duration" name="Pin 2 Duration" modbusAddr="40013" accessRights="ro" Description="Pin 2 Duration Value" maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="2" bitlength="32" appliesTo="" accesslevel="all" format=""/>
+        <dataitem id="pin2eventsperminute" name="Pin 2 Events per Minute" modbusAddr="40015" accessRights="ro" Description="Pin 2 Events per Minute" maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="2" bitlength="32" appliesTo="" accesslevel="all" format=""/>
+        <dataitem id="pin2totalizercount" name="Pin 2 Totalizer Count" modbusAddr="40017" accessRights="ro" Description="Pin 2 Totalizer Count" maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="2" bitlength="32" appliesTo="" accesslevel="all" format=""/>
+		
+	<!--Tabled 2 Metric Count Presets-->
+        <dataitem id="pin4CountMetPreset" name="Pin 4 Count Metric Preset" modbusAddr="40100" accessRights="rw" Description="Pin 4 Count Metric Preset Value" maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="2" bitlength="32" appliesTo="" accesslevel="all" format=""/>
+        <dataitem id="pin2CountMetPreset" name="Pin 2 Count Metric Preset" modbusAddr="40102" accessRights="rw" Description="Pin 2 Count Metric Preset Value" maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="2" bitlength="32" appliesTo="" accesslevel="all" format=""/>
+	
+	<!--Table 3 Pin 4 Port Configuration-->
+        <dataitem id="pin4ioselection" name="Pin 4 IO Selection" modbusAddr="40200" accessRights="rw" Description="Pin 4 IO Selection" maxVal="5" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format="">
+			<singlevalue val="0" text="NPN input"/>
+            <singlevalue val="1" text="PNP Input"/>
+            <singlevalue val="2" text="NPN Output wirh pull up"/>
+            <singlevalue val="3" text="PNP output with pull down"/>
+            <singlevalue val="4" text="NPN output push/pull"/>
+            <singlevalue val="5" text="PNP output push/pull"/>
+		</dataitem>
+        <dataitem id="pin4mode" name="Pin 4 Mode" modbusAddr="40201" Description="Pin 4 IO Mode" datatype="unsignedint" maxVal="10" minVal="0" scale="1" numregs="1" bitlength="16" accessRights="rw" appliesTo="" accesslevel="all" format="">
+			<singlevalue val="0" text="Disabled"/>
+            <singlevalue val="1" text="On Off Delay" default="true"/>
+            <singlevalue val="2" text="On One-shot"/>
+            <singlevalue val="3" text="Off One-Shot"/>
+            <singlevalue val="4" text="On Pulse Stretcher"/>
+            <singlevalue val="5" text="Off Pulse Stretcher"/>
+			<singlevalue val="6" text="Totalizer"/>
+			<singlevalue val="7" text="Retriggerable On One-shot"/>
+			<singlevalue val="8" text="Retriggerable Off One-shot"/>
+			<singlevalue val="9" text="PWM"/>
+			<singlevalue val="10" text="PFM"/>
+		</dataitem>
+        <dataitem id="pin4delaytimer1" name="Pin 4 Delay Timer 1" modbusAddr="40202" accessRights="rw" Description="Pin 4 Delay Timer 1" maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="2" bitlength="32" appliesTo="" accesslevel="all" format=""/>
+        <dataitem id="pin4delaytimer2" name="Pin 4 Delay Timer 2" modbusAddr="40204" accessRights="rw" Description="Pin 4 Delay Timer 1" maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="2" bitlength="32" appliesTo="" accesslevel="all" format=""/>
+
+
+        <dataitem id="pin4mirroringenable" name="Pin 4 Mirroring Enable" modbusAddr="40206" Description="0= Disabled, 1= Enabled" default="0" maxVal="1" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" accessRights="rw" appliesTo="" accesslevel="all" format="">
+			<singlevalue val="0" text="Disabled"/>
+            <singlevalue val="1" text="Enabled" />
+		</dataitem>
+        <dataitem id="pin4mirroringselection" name="Pin 4 Mirroring Selection" modbusAddr="40207" Description="0= Pin 4, 1= Pin 2" default="0" maxVal="1" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" accessRights="rw" appliesTo="" accesslevel="all" format="">
+			<singlevalue val="0" text="Pin 4"/>
+            <singlevalue val="1" text="Pin 2" />
+		</dataitem>
+        <dataitem id="pin4mirroringinversion" name="Pin 4 Mirroring Inversion" modbusAddr="40208" Description="0= Not Inverted, 1= Inverted" default="0" maxVal="1" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" accessRights="rw" appliesTo="" accesslevel="all" format="">
+			<singlevalue val="0" text="Not Inverted"/>
+            <singlevalue val="1" text="Inverted" />
+		</dataitem>
+        <dataitem id="pin4PWMbasefrequency" name="Pin 4 PWM Base Frequency" modbusAddr="40209" accessRights="rw" Description="PWM Base Frequency" maxVal="4000" minVal="200" scale="1" units="Hz" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format=""/>
+        <dataitem id="pin4PWMpercentage" name="Pin 4 PWM Percentage" modbusAddr="40210" accessRights="rw" Description="PWM Percentage" maxVal="100" minVal="0" scale="1" units="%" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format=""/>
+        <dataitem id="pin4PFMfrequency" name="Pin 4 PFM Frequency" modbusAddr="40211" accessRights="rw" Description="PFM Frequency" maxVal="50000" minVal="50" scale="1" units="Hz" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format=""/>
+		
+	
+	<!--Table 4 Pin 2 Port Configuration-->
+        <dataitem id="pin2ioselection" name="Pin 2 IO Selection" modbusAddr="40300" Description="Pin 2 IO Selection" maxVal="5" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" accessRights="rw" appliesTo="" accesslevel="all" format="">
+			<singlevalue val="0" text="NPN input"/>
+            <singlevalue val="1" text="PNP Input" default="true"/>
+            <singlevalue val="2" text="NPN Output wirh pull up"/>
+            <singlevalue val="3" text="PNP output with pull down"/>
+            <singlevalue val="4" text="NPN output push/pull"/>
+            <singlevalue val="5" text="PNP output push/pull"/>
+		</dataitem>
+        <dataitem id="pin2mode" name="Pin 2 Mode" modbusAddr="40301" Description="Pin 2 IO Mode" maxVal="6" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" accessRights="rw" appliesTo="" accesslevel="all" format="">
+			<singlevalue val="0" text="Disabled"/>
+            <singlevalue val="1" text="On Off Delay" default="true"/>
+            <singlevalue val="2" text="On One-shot"/>
+            <singlevalue val="3" text="Off One-Shot"/>
+            <singlevalue val="4" text="On Pulse Stretcher"/>
+            <singlevalue val="5" text="Off Pulse Stretcher"/>
+			<singlevalue val="6" text="Totalizer"/>
+			<singlevalue val="7" text="Retriggerable On One-shot"/>
+			<singlevalue val="8" text="Retriggerable Off One-shot"/>
+			<singlevalue val="9" text="PWM"/>
+			<singlevalue val="10" text="PFM"/>
+		</dataitem>
+        <dataitem id="pin2delaytimer1" name="Pin 2 Delay Timer 1" modbusAddr="40302" accessRights="rw" Description="Pin 2 Delay Timer 1" maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="2" bitlength="32" appliesTo="" accesslevel="all" format=""/>
+        <dataitem id="pin2delaytimer2" name="Pin 2 Delay Timer 2" modbusAddr="40304" accessRights="rw" Description="Pin 2 Delay Timer 1" maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="2" bitlength="32" appliesTo="" accesslevel="all" format=""/>
+
+        <dataitem id="pin2mirroringenable" name="Pin 2 Mirroring Enable" modbusAddr="40306" Description="0= Disabled, 1= Enabled" maxVal="1" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" accessRights="rw" appliesTo="" accesslevel="all" format="">
+			<singlevalue val="0" text="Disabled"/>
+            <singlevalue val="1" text="Enabled" />
+		</dataitem>
+        <dataitem id="pin2mirroringselection" name="Pin 2 Mirroring Selection" modbusAddr="40307" Description="0= Pin 4, 1= Pin 2" maxVal="1" minVal="0" scale="1" default="0" datatype="unsignedint" numregs="1" bitlength="16" accessRights="rw" appliesTo="" accesslevel="all" format="">
+			<singlevalue val="0" text="Pin 4"/>
+            <singlevalue val="1" text="Pin 2" />
+		</dataitem>
+        <dataitem id="pin2mirroringinversion" name="Pin 2 Mirroring Inversion" modbusAddr="40308" Description="0= Not Inverted, 1= Inverted" maxVal="1" minVal="0" scale="1" default="0" datatype="unsignedint" numregs="1" bitlength="16" accessRights="rw" appliesTo="" accesslevel="all" format="">
+			<singlevalue val="0" text="Not Inverted"/>
+            <singlevalue val="1" text="Inverted" />
+		</dataitem>	
+	<!--Table 5: Active Configuration-->
+        <dataitem id="pin4output" name="Pin 4 Output" modbusAddr="40400" Description="0= Inactive, 1= Active" default="0" maxVal="1" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" accessRights="rw" appliesTo="" accesslevel="all" format="">
+			<singlevalue val="0" text="Inactive"/>
+            <singlevalue val="1" text="Active" />
+        </dataitem>
+        <dataitem id="pin2output" name="Pin 2 Output" modbusAddr="40401" Description="0= Inactive, 1= Active" default="0" maxVal="1" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" accessRights="rw" appliesTo="" accesslevel="all" format="">
+            <singlevalue val="0" text="Inactive"/>
+            <singlevalue val="1" text="Active" />
+        </dataitem>
+        <dataitem id="countspermin" name="Counts per Min Mode" modbusAddr="40402" Description="0= Slow, 1= Medium, 2= Fast" default="1" maxVal="2" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" accessRights="rw" appliesTo="" accesslevel="all" format="">
+            <singlevalue val="0" text="Slow"/>
+            <singlevalue val="1" text="Medium" />
+            <singlevalue val="2" text="Fast" />
+        </dataitem>
+        <!--Table 6: Discrete Host Out Mirroring (Gray- Male)-->
+        <dataitem id="hostmirroringenable" name="Host Mirroring Enable" modbusAddr="40500" Description="0= Disable, 1= Enable" default="0" maxVal="1" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" accessRights="rw" appliesTo="" accesslevel="all" format="">
+			<singlevalue val="0" text="Disable"/>
+            <singlevalue val="1" text="Enable" />
+        </dataitem>
+        <dataitem id="hostmirrorchannelselection" name="Host Mirror Channel Selection" modbusAddr="40501" Description="0= Pin 4, 1= Pin 2" default="0" maxVal="1" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" accessRights="rw" appliesTo="" accesslevel="all" format="">
+			<singlevalue val="0" text="Pin 4"/>
+            <singlevalue val="1" text="Pin 2" />
+        </dataitem>
+        <dataitem id="hostmirroringinversion" name="Host Mirroring Inversion" modbusAddr="40502" Description="0= Not Inverted, 1= Inverted" default="0" maxVal="1" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" accessRights="rw" appliesTo="" accesslevel="all" format="">
+			<singlevalue val="0" text="Not Inverted"/>
+            <singlevalue val="1" text="Inverted" />
+        </dataitem>
+        <dataitem id="hostmirroringpolarity" name="Host Mirroring Polarity" modbusAddr="40503" Description="0= NPN Output, 1= PNP Output" default="1" maxVal="1" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" accessRights="rw" appliesTo="" accesslevel="all" format="">
+			<singlevalue val="0" text="NPN Output"/>
+            <singlevalue val="1" text="PNP Output" />
+        </dataitem>
+        <dataitem id="hostmirroringoutputtype" name="Host Mirroring Output Type" modbusAddr="40504" Description="0= Output with Internal Pull Up/Down, 1= Output Open Collector, 2= Output Push Pull" default="0" maxVal="2" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" accessRights="rw" appliesTo="" accesslevel="all" format="">
+			<singlevalue val="0" text="Output with Internal Pull Up/Down"/>
+			<singlevalue val="1" text=" Output Open Collector"/>
+            <singlevalue val="2" text="Output Push Pull" />
+		</dataitem>	
+    </dataitems>
+
+    <uielements>
+        <uielement type="table">
+            <input val="Pin 4 Active State"/>
+            <input val="Pin 2 Active State"/>
+			
+            <input val="Pin 4 Count Higher (H)"/>
+			<input val="Pin 4 Count Lower (L)"/>
+			<input val="Pin 4 Duration (H)"/>
+            <input val="Pin 4 Duration (L)"/>
+            <input val="Pin 4 Events per Minute (H)"/>
+			<input val="Pin 4 Count Lower (L)"/>
+			<input val="Pin 4 Duration (H)"/>
+            <input val="Pin 4 Duration (L)"/>
+            <input val="Pin 4 Totalizer Count (H)"/>
+			<input val="Pin 4 Totalizer Count (L)"/>
+			
+			<input val="Pin 2 Count Higher (H)"/>
+			<input val="Pin 2 Count Lower (L)"/>
+			<input val="Pin 2 Duration (H)"/>
+            <input val="Pin 2 Duration (L)"/>
+            <input val="Pin 2 Events per Minute (H)"/>
+			<input val="Pin 2 Count Lower (L)"/>
+			<input val="Pin 2 Duration (H)"/>
+            <input val="Pin 2 Duration (L)"/>
+            <input val="Pin 2 Totalizer Count (H)"/>
+			<input val="Pin 2 Totalizer Count (L)"/>
+			
+        </uielement>
+    </uielements>
+    
+    <demo>
+        <uielements>
+            <uielement type="table" Title="Table of Device Data">
+                <input val="pin2count" numstates="2" states=""/>
+                <input val="pin4count" numstates="2" states=""/>
+            </uielement>
+            <uielement type="indicator" Title="Pin 4 Active" >
+                <input val="pin4activestate" numstates="2" states="0:Red;1:Green" />
+            </uielement>
+            <uielement type="indicator" Title="Pin 2 Active" >
+                <input val="pin2activestate" numstates="2" states="0:Red;1:Green" />
+            </uielement>
+        </uielements>
+    </demo>
+</Modd>

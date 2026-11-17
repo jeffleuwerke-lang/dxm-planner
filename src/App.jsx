@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 
 // ── Sensor Database ───────────────────────────────────────────────────────
 const SENSOR_DB = {
@@ -154,7 +154,157 @@ const SENSOR_DB = {
   ],
 };
 
-const MODEL_LIST    = ["", ...Object.keys(SENSOR_DB).sort()];
+// ── Sensor registry: built-in + repo MODD library + local browser imports ──
+// SENSOR_DB stays the single lookup table used everywhere. Built-in entries
+// (above, datasheet-verified) always win; MODD-derived entries are added at
+// runtime. App bumps `dbVersion` whenever the registry changes so memos refresh.
+const SENSOR_SOURCE = {};   // model name -> "builtin" | "library" | "custom"
+const SENSOR_FAMILY = {};   // model name -> family label (library / custom only)
+Object.keys(SENSOR_DB).forEach(k => { SENSOR_SOURCE[k] = "builtin"; });
+
+// Connection options only (-M / -MQ / -MQP): same Modbus device, same register map.
+const baseModel = (n) => String(n).trim().replace(/-(MQP|MQ|M)$/i, "").toUpperCase();
+// Explicit aliases where a MODD file name differs from the datasheet model name.
+const MODEL_ALIASES = { "S15C-CT150-MQ": "S15C-CT150A-MQ" };
+
+function resolveModel(name) {
+  if (!name) return "";
+  const n = String(name).trim();
+  if (SENSOR_DB[n]) return n;
+  const alias = MODEL_ALIASES[n];
+  if (alias && SENSOR_DB[alias]) return alias;
+  const b = baseModel(alias || n);
+  return Object.keys(SENSOR_DB).find(k => baseModel(k) === b) || "";
+}
+
+// Dropdown groups: Built-in first, then library families, then this browser's imports.
+function getModelGroups() {
+  const byName = (a, b) => a.localeCompare(b);
+  const names = Object.keys(SENSOR_DB);
+  const groups = [{ label: "Built-in", models: names.filter(n => SENSOR_SOURCE[n] === "builtin").sort(byName) }];
+  const fam = {};
+  names.filter(n => SENSOR_SOURCE[n] === "library").forEach(n => {
+    const f = SENSOR_FAMILY[n] || "Other";
+    (fam[f] = fam[f] || []).push(n);
+  });
+  Object.keys(fam).sort(byName).forEach(f => groups.push({ label: `Library — ${f}`, models: fam[f].sort(byName) }));
+  const custom = names.filter(n => SENSOR_SOURCE[n] === "custom").sort(byName);
+  if (custom.length) groups.push({ label: "My imports (this browser)", models: custom });
+  return groups;
+}
+
+// ── MODD parsing ───────────────────────────────────────────────────────────
+// Imports the read-only measurement block (4xxxx addresses below 40100) of a
+// Banner MODD file as one contiguous staging block. Gaps of up to MODD_MAX_GAP
+// registers are filled with "Reserved" (the planner reads one block per sensor);
+// a larger gap ends the block. Configuration (rw) registers are not imported.
+const MODD_MIN_ADDR = 40001, MODD_MAX_ADDR = 40099, MODD_MAX_GAP = 8;
+
+function parseModd(text) {
+  const doc = new DOMParser().parseFromString(String(text).replace(/^﻿/, ""), "application/xml");
+  if (doc.querySelector("parsererror")) throw new Error("not valid XML");
+  const rootName = doc.documentElement.localName;
+  if (rootName !== "Modd") throw new Error(`not a MODD file (root element is <${rootName}>)`);
+
+  const warnings = [];
+  const ids = [...doc.getElementsByTagName("deviceid")].map(e => e.getAttribute("val")).filter(Boolean);
+  const items = [...doc.getElementsByTagName("dataitem")]
+    .filter(e => ["ro", "r"].includes(e.getAttribute("accessRights")))
+    .map(e => ({ e, addr: parseInt(e.getAttribute("modbusAddr"), 10) }))
+    .filter(x => x.addr >= MODD_MIN_ADDR && x.addr <= MODD_MAX_ADDR)
+    .sort((a, b) => a.addr - b.addr);
+  if (!items.length) throw new Error("no read-only registers found in 40001–40099");
+
+  const regs = [];
+  let next = null, seen = new Set(), truncated = false;
+  const reserved = (addr) => ({ reg: addr, desc: "Reserved", scale_exp: 0, divide_by: 1, raw_max: 65535, units: "—" });
+
+  for (const { e, addr } of items) {
+    if (seen.has(addr)) { warnings.push(`duplicate register ${addr} ignored`); continue; }
+    if (next !== null && addr > next) {
+      if (addr - next > MODD_MAX_GAP) { truncated = true; warnings.push(`block ends at ${next - 1}; next register ${addr} is beyond a ${addr - next}-register gap`); break; }
+      for (let a = next; a < addr; a++) regs.push(reserved(a));
+    }
+    const n = Math.max(1, parseInt(e.getAttribute("numregs") || "1", 10) || 1);
+    const desc = (e.getAttribute("Description") || e.getAttribute("name") || `Register ${addr}`).trim();
+    const unitAttr = (e.getAttribute("units") || "").trim();
+    const paren = desc.match(/\(([^()]*)\)\s*$/);
+    const units = (unitAttr && unitAttr !== "@series" && unitAttr !== "None") ? unitAttr : (paren ? paren[1].trim() : "");
+    const sc = parseFloat(e.getAttribute("scale"));
+    const dt = (e.getAttribute("datatype") || "").toLowerCase();
+    let divide_by = 1, scale_exp = 0;
+    if (sc > 0 && sc < 1) {
+      divide_by = Math.round(1 / sc); scale_exp = Math.round(Math.log10(sc));
+      if (Math.abs(divide_by * sc - 1) > 1e-6) warnings.push(`register ${addr}: scale ${sc} is not a whole divisor; used ÷${divide_by}`);
+    } else if (sc > 1) warnings.push(`register ${addr}: scale ${sc} is a multiplier; shown unscaled`);
+    const maxV = parseFloat(e.getAttribute("maxVal"));
+    const cap = dt.startsWith("int") ? 32767 : 65535;
+    let raw_max = Number.isFinite(maxV) && maxV > 0 ? Math.round(maxV / (sc > 0 ? sc : 1)) : cap;
+    if (raw_max > cap) raw_max = cap;
+    if (n === 1) {
+      regs.push({ reg: addr, desc, scale_exp, divide_by, raw_max, units });
+    } else {
+      // Multi-register value: one entry per 16-bit register (same convention as S15C-B22-MQ).
+      for (let i = 0; i < n; i++) {
+        const tag = n === 2 ? (i === 0 ? "H" : "L") : `${i + 1}/${n}`;
+        const u = n === 2 ? (i === 0 ? "(upper 16)" : "(lower 16)") : `(part ${i + 1} of ${n})`;
+        regs.push({ reg: addr + i, desc: `${desc} ${tag}`, scale_exp: 0, divide_by: 1, raw_max: 65535, units: units ? `${units} ${u}` : u });
+      }
+    }
+    for (let i = 0; i < n; i++) seen.add(addr + i);
+    next = addr + n;
+  }
+  if (regs.length > 100) throw new Error(`${regs.length} registers is more than one sensor block can hold`);
+  return { deviceId: ids[0] || "", regs, warnings, truncated };
+}
+
+// Compare a MODD-derived block with a built-in entry; returns human-readable differences.
+function compareToBuiltin(parsed, builtinRegs) {
+  const out = [];
+  if (parsed.regs.length !== builtinRegs.length) out.push(`register count ${parsed.regs.length} (MODD) vs ${builtinRegs.length} (built-in)`);
+  if (parsed.regs[0] && builtinRegs[0] && parsed.regs[0].reg !== builtinRegs[0].reg) out.push(`first register ${parsed.regs[0].reg} vs ${builtinRegs[0].reg}`);
+  const bm = Object.fromEntries(builtinRegs.map(r => [r.reg, r]));
+  parsed.regs.forEach(r => {
+    const b = bm[r.reg];
+    if (!b) out.push(`${r.reg}: not in built-in`);
+    else if (b.desc !== "Reserved" && r.desc !== "Reserved" && b.divide_by !== r.divide_by) out.push(`${r.reg}: ÷${r.divide_by} (MODD) vs ÷${b.divide_by} (built-in)`);
+  });
+  return out;
+}
+
+// Adds a parsed sensor to the registry. Built-in definitions always win.
+// Returns { status: "added"|"kept", note }.
+function registerSensor(name, parsed, source, family) {
+  const existing = resolveModel(name);
+  if (existing) {
+    const exSrc = SENSOR_SOURCE[existing];
+    // Only a re-import of the same custom sensor replaces; everything else keeps the existing entry
+    // (built-in > library > custom, first library entry wins).
+    const replaceSelf = exSrc === "custom" && source === "custom" && existing === name;
+    if (!replaceSelf) {
+      return { status: "kept", existing, existingSource: exSrc,
+        diffs: exSrc === "builtin" ? compareToBuiltin(parsed, SENSOR_DB[existing]) : [] };
+    }
+  }
+  SENSOR_DB[name] = parsed.regs;
+  SENSOR_SOURCE[name] = source;
+  if (family) SENSOR_FAMILY[name] = family;
+  return { status: "added" };
+}
+
+// Removes every non-built-in entry so a reload of the library starts clean (keeps loading idempotent).
+function resetDynamicSensors() {
+  Object.keys(SENSOR_DB).forEach(k => {
+    if (SENSOR_SOURCE[k] !== "builtin") { delete SENSOR_DB[k]; delete SENSOR_SOURCE[k]; delete SENSOR_FAMILY[k]; }
+  });
+}
+
+const CUSTOM_LS_KEY = "dxmplanner.customSensors";
+const loadCustomStore = () => { try { return JSON.parse(localStorage.getItem(CUSTOM_LS_KEY) || "[]") || []; } catch { return []; } };
+const saveCustomStore = (list) => { try { localStorage.setItem(CUSTOM_LS_KEY, JSON.stringify(list)); return true; } catch { return false; } };
+const LIB_BASE = (() => { try { return import.meta.env.BASE_URL || "./"; } catch { return "./"; } })();
+const modelNameFromFile = (fn) => fn.replace(/\.(xml|txt)$/i, "").replace(/[ _.]?modd$/i, "").trim();
+
 const STAG_BASE     = 5001;
 const STAG_MAX_REGS = 2000;
 const MAX_SENSORS   = 40;
@@ -514,7 +664,12 @@ function SensorCard({ sensor, sensorNum, portSensorNum, isDuplicate, isStagConfl
           <div style={{ display: "grid", gridTemplateColumns: "2fr 2.5fr 1fr 1.5fr", gap: 12, marginBottom: 12 }}>
             <Field label="Sensor Model">
               <select value={sensor.model} onChange={e => update("model", e.target.value)} style={selectStyle}>
-                {MODEL_LIST.map(m => <option key={m} value={m}>{m || "— Select model —"}</option>)}
+                <option value="">— Select model —</option>
+                {getModelGroups().map(g => (
+                  <optgroup key={g.label} label={g.label}>
+                    {g.models.map(m => <option key={m} value={m}>{m}</option>)}
+                  </optgroup>
+                ))}
               </select>
             </Field>
             <Field label={`Location / Description (${sensor.location.length}/32)`}>
@@ -897,6 +1052,93 @@ export default function App() {
   const [notes, setNotes]   = useState("");
   const [copied, setCopied] = useState(null);
   const [loadError, setLoadError] = useState("");
+
+  // ── Sensor library (repo MODD files + this browser's imports) ───────────
+  const [dbVersion, setDbVersion] = useState(0);          // bumped when SENSOR_DB changes
+  const bumpDb = () => setDbVersion(v => v + 1);
+  const [libState, setLibState] = useState({ status: "loading", loaded: 0, failed: [], notes: [] });
+  const [libOpen, setLibOpen] = useState(false);
+  const [importMsgs, setImportMsgs] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      resetDynamicSensors();
+      const failed = [], notes = [];
+      let added = 0;
+      try {
+        const mres = await fetch(`${LIB_BASE}modd/manifest.json`, { cache: "no-cache" });
+        if (!mres.ok) throw new Error(`manifest.json: HTTP ${mres.status}`);
+        const manifest = await mres.json();
+        const entries = Array.isArray(manifest.devices) ? manifest.devices : [];
+        const results = await Promise.all(entries.map(async (d) => {
+          try {
+            const r = await fetch(`${LIB_BASE}modd/${d.file}`, { cache: "no-cache" });
+            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+            return { d, parsed: parseModd(await r.text()) };
+          } catch (err) { return { d, error: err.message }; }
+        }));
+        if (cancelled) return;
+        results.forEach(({ d, parsed, error }) => {
+          if (error) { failed.push(`${d.file}: ${error}`); return; }
+          const r = registerSensor(d.name, parsed, "library", d.family);
+          if (r.status === "added") added++;
+          else notes.push({ name: d.name, text: `matches ${r.existing} (${r.existingSource}) — existing definition used`, diffs: r.diffs || [] });
+          parsed.warnings.forEach(w => notes.push({ name: d.name, text: w, diffs: [], warn: true }));
+        });
+      } catch (err) {
+        failed.push(`Sensor library could not be loaded (${err.message}). Built-in sensors still work.`);
+      }
+      if (cancelled) return;
+      loadCustomStore().forEach(c => {
+        try { if (c?.name && Array.isArray(c.regs) && c.regs.length) registerSensor(c.name, { regs: c.regs, warnings: [] }, "custom", "Imported"); } catch { /* ignore bad entry */ }
+      });
+      setLibState({ status: failed.length ? (added ? "partial" : "error") : "ready", loaded: added, failed, notes });
+      bumpDb();
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const importModdFiles = async (fileList) => {
+    const msgs = [];
+    const store = loadCustomStore();
+    let changed = false;
+    for (const f of fileList) {
+      const name = modelNameFromFile(f.name);
+      try {
+        const parsed = parseModd(await f.text());
+        const r = registerSensor(name, parsed, "custom", "Imported");
+        if (r.status === "added") {
+          const rec = { name, regs: parsed.regs, fileName: f.name, importedAt: new Date().toISOString() };
+          const i = store.findIndex(c => c.name === name);
+          if (i >= 0) store[i] = rec; else store.push(rec);
+          changed = true;
+          const first = parsed.regs[0].reg, last = parsed.regs[parsed.regs.length - 1].reg;
+          msgs.push({ ok: true, text: `✓ ${name}: ${parsed.regs.length} registers (${first}–${last}) added — review the labels in the sensor table.` +
+            (parsed.warnings.length ? ` Notes: ${parsed.warnings.join("; ")}.` : "") });
+        } else {
+          msgs.push({ ok: false, text: `${name}: matches ${r.existing} (${r.existingSource}) — the existing definition is kept, nothing imported.` });
+        }
+      } catch (err) {
+        msgs.push({ ok: false, text: `${f.name}: ${err.message}` });
+      }
+    }
+    if (changed && !saveCustomStore(store)) {
+      msgs.push({ ok: false, text: "Could not save to browser storage — imports will last only until this tab is closed." });
+    }
+    setImportMsgs(msgs);
+    bumpDb();
+  };
+
+  const removeCustom = (name) => {
+    const inUse = sensors.filter(s => s.model === name).length;
+    if (inUse) { setImportMsgs([{ ok: false, text: `${name} is used by ${inUse} configured sensor${inUse > 1 ? "s" : ""} — change those first.` }]); return; }
+    delete SENSOR_DB[name]; delete SENSOR_SOURCE[name]; delete SENSOR_FAMILY[name];
+    saveCustomStore(loadCustomStore().filter(c => c.name !== name));
+    setImportMsgs([]);
+    bumpDb();
+  };
+
   const [configGuid, setConfigGuid] = useState(() =>
     'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
       const r = Math.random()*16|0; return (c==='x'?r:(r&0x3|0x8)).toString(16);
@@ -937,7 +1179,7 @@ export default function App() {
       if (ids.length > 1) ids.forEach(id => conflictingIds.add(id));
     });
     return conflictingIds;
-  }, [sensors]);
+  }, [sensors, dbVersion]);
 
   const isStagConflict = (s) => stagConflicts.has(s.id);
 
@@ -959,8 +1201,8 @@ export default function App() {
       });
     });
     return { toPlc, fromPlc };
-  }, [sensors, dxmInfo.hasPort5]);
-  const eipMax    = Math.max(eipCounts.toPlc, eipCounts.fromPlc);
+  }, [sensors, dxmInfo.hasPort5, dbVersion]);
+  const eipMax   = Math.max(eipCounts.toPlc, eipCounts.fromPlc);
   const eipLevel  = eipMax > EIP_LIMIT ? "exceeded" : eipMax >= EIP_WARN_AT ? "approaching" : "ok";
   const eipMsg    = eipLevel === "exceeded"
     ? `EtherNet/IP limit exceeded — DXM→PLC ${eipCounts.toPlc} / PLC→DXM ${eipCounts.fromPlc} (max ${EIP_LIMIT} per direction). Registers beyond ${EIP_LIMIT} will not be usable on the DXM; remove some mappings before deploying.`
@@ -1060,7 +1302,7 @@ export default function App() {
   const effectiveNotes = notes.trim() || autoNotes;
   const fullXml = useMemo(() =>
     buildFullXml(sensors, logFiles, xmlFilename, effectiveNotes, configGuid, projectMeta.dxmIp||"", dxmType),
-    [sensors, logFiles, xmlFilename, effectiveNotes, configGuid, projectMeta.dxmIp, dxmType]
+    [sensors, logFiles, xmlFilename, effectiveNotes, configGuid, projectMeta.dxmIp, dxmType, dbVersion]
   );
 
   const copy = (text, key) => {
@@ -1069,6 +1311,7 @@ export default function App() {
 
   // ── Load XML ─────────────────────────────────────────────────────────────
   const loadXmlFile = (file) => {
+    if (libState.status === "loading") { setLoadError("Sensor library is still loading — try again in a moment."); return; }
     setLoadError("");
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -1100,6 +1343,7 @@ export default function App() {
           !r.getAttribute("name")?.endsWith(" pt2") && !r.getAttribute("name")?.endsWith(" (cont)")
         );
 
+        const missingModels = [];
         primaryRules.forEach((rule, idx) => {
           if (idx >= MAX_SENSORS) return;
           const localreg = parseInt(rule.getAttribute("localreg")||"5001");
@@ -1109,11 +1353,15 @@ export default function App() {
           const poll     = parseFloat(rule.getAttribute("poll")||"1");
           const count    = parseInt(rule.getAttribute("count")||"0");
           const modelComment = rule.outerHTML.match(/<!--\s*model="([^"]+)"/);
-          const model    = (modelComment && SENSOR_DB[modelComment[1]])
-            ? modelComment[1]
-            : Object.keys(SENSOR_DB).find(m =>
-                SENSOR_DB[m].length === count || (count === 40 && SENSOR_DB[m].length > 40)
-              ) || "";
+          const commentName  = modelComment ? modelComment[1] : "";
+          const resolved     = resolveModel(commentName);
+          // A model this planner doesn't know is reported, never silently dropped or guessed.
+          if (commentName && !resolved) missingModels.push(`${commentName} (Port ${port}, ID ${unit})`);
+          // No model comment (file not made by this tool): fall back to a built-in with the same register count.
+          const model    = resolved || (commentName ? "" : (Object.keys(SENSOR_DB).find(m =>
+                SENSOR_SOURCE[m] === "builtin" &&
+                (SENSOR_DB[m].length === count || (count === 40 && SENSOR_DB[m].length > 40))
+              ) || ""));
 
           const logConfig = {};
           if (model && SENSOR_DB[model]) {
@@ -1177,9 +1425,14 @@ export default function App() {
 
         setSensors(newSensors);
         setLogFiles(newLogFiles);
-        setLoadError(loadedGuid
-          ? "✓ Configuration loaded successfully. GUID preserved."
-          : "✓ Configuration loaded. No valid GUID in file — kept the current GUID.");
+        if (missingModels.length) {
+          setLoadError(`⚠ Loaded, but no sensor definition for: ${missingModels.join(", ")}. ` +
+            `Those sensors are NOT in the generated XML — import the matching MODD file on the Setup tab, then load this file again.`);
+        } else {
+          setLoadError(loadedGuid
+            ? "✓ Configuration loaded successfully. GUID preserved."
+            : "✓ Configuration loaded. No valid GUID in file — kept the current GUID.");
+        }
       } catch(err) {
         setLoadError("Error loading XML: "+err.message);
       }
@@ -1482,6 +1735,96 @@ export default function App() {
               <div style={{ fontSize:11, color:"#888780", marginBottom:12 }}>
                 Sensors organized by port. Max 40 sensors. Local registers 5001–7000 used for data collection. Wireless Modbus IDs: 11–60.
               </div>
+
+              {/* ── Sensor library ── */}
+              {(() => {
+                const customNames = Object.keys(SENSOR_SOURCE).filter(k => SENSOR_SOURCE[k] === "custom").sort();
+                const libCount = Object.keys(SENSOR_SOURCE).filter(k => SENSOR_SOURCE[k] === "library").length;
+                const builtinCount = Object.keys(SENSOR_SOURCE).filter(k => SENSOR_SOURCE[k] === "builtin").length;
+                const pill = { fontFamily:"monospace", fontSize:10, borderRadius:2, padding:"1px 6px" };
+                return (
+                  <div style={{ background:"#ffffff", border:"0.5px solid #D3D1C7", borderRadius:5,
+                    padding:"10px 14px", marginBottom:14 }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:10, flexWrap:"wrap" }}>
+                      <span style={{ fontSize:11, fontWeight:700, color:"#2C2C2A", textTransform:"uppercase", letterSpacing:"0.08em" }}>
+                        Sensor Library
+                      </span>
+                      {libState.status === "loading" ? (
+                        <span style={{ fontSize:11, color:"#888780", fontStyle:"italic" }}>loading…</span>
+                      ) : (
+                        <>
+                          <span style={{ ...pill, background:"#FAEEDA", color:"#633806" }}>{builtinCount} built-in</span>
+                          <span style={{ ...pill, background:"#EAF3DE", color:"#27500A" }}>{libCount} from library</span>
+                          <span style={{ ...pill, background:"#F1EFE8", color:"#5F5E5A" }}>{customNames.length} imported here</span>
+                        </>
+                      )}
+                      <span style={{ flex:1 }} />
+                      <button onClick={() => setLibOpen(o => !o)} style={{ ...smallBtnStyle, background:"#ffffff", color:"#2C2C2A", borderColor:"#D3D1C7" }}>
+                        {libOpen ? "Hide details ▲" : "Details ▼"}
+                      </button>
+                      <label style={{ ...smallBtnStyle, display:"inline-block", padding:"4px 12px" }}>
+                        ⬆ Import MODD file…
+                        <input type="file" accept=".xml,.txt" multiple style={{ display:"none" }}
+                          onChange={e => { if (e.target.files.length) importModdFiles([...e.target.files]); e.target.value = ""; }} />
+                      </label>
+                    </div>
+
+                    {libState.failed.length > 0 && (
+                      <div style={{ background:"#FEE2E2", border:"1px solid #FCA5A5", borderRadius:4, padding:"6px 10px",
+                        marginTop:8, fontSize:11, color:"#991B1B" }}>
+                        ⚠ {libState.failed.length} problem{libState.failed.length !== 1 ? "s" : ""} loading the shared library — affected sensors are not in the dropdown:
+                        {libState.failed.map((f, i) => <div key={i} style={{ fontFamily:"monospace", marginTop:2 }}>{f}</div>)}
+                      </div>
+                    )}
+
+                    {importMsgs.length > 0 && (
+                      <div style={{ marginTop:8, fontSize:11 }}>
+                        {importMsgs.map((m, i) => (
+                          <div key={i} style={{ color: m.ok ? "#27500A" : "#991B1B", fontWeight:600, marginTop:2 }}>{m.text}</div>
+                        ))}
+                      </div>
+                    )}
+
+                    {libOpen && (
+                      <div style={{ marginTop:10, borderTop:"0.5px solid #D3D1C7", paddingTop:8, fontSize:11, color:"#5F5E5A" }}>
+                        <div style={{ marginBottom:6 }}>
+                          Built-in sensors are datasheet-verified and always take priority. Library sensors come from MODD files hosted with this site
+                          and are the same for every user. Imported sensors are stored only in this browser. Only the read-only measurement
+                          registers (40001–40099) are imported; labels come from the MODD file, so review them.
+                        </div>
+                        {customNames.length > 0 && (
+                          <div style={{ marginBottom:8 }}>
+                            <div style={{ fontWeight:700, color:"#2C2C2A", marginBottom:3 }}>Imported in this browser</div>
+                            {customNames.map(n => (
+                              <div key={n} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:2 }}>
+                                <span style={{ fontFamily:"monospace" }}>{n}</span>
+                                <span style={{ color:"#888780" }}>{SENSOR_DB[n].length} regs</span>
+                                <button onClick={() => removeCustom(n)}
+                                  style={{ background:"none", border:"none", color:"#dc2626", cursor:"pointer", fontWeight:700, fontSize:11 }}>✕ Remove</button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {libState.notes.length > 0 && (
+                          <div>
+                            <div style={{ fontWeight:700, color:"#2C2C2A", marginBottom:3 }}>Library notes</div>
+                            {libState.notes.map((n, i) => (
+                              <div key={i} style={{ marginBottom:3, color: n.warn ? "#854F0B" : "#5F5E5A" }}>
+                                <span style={{ fontFamily:"monospace", fontWeight:600 }}>{n.name}</span> — {n.text}
+                                {n.diffs.length > 0 && (
+                                  <div style={{ marginLeft:14, color:"#BA7517" }}>
+                                    differs from built-in: {n.diffs.join("; ")}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
 
               {conflicts.length > 0 && (
                 <div style={{ background:"#FEE2E2", border:"1px solid #FCA5A5", borderRadius:5,

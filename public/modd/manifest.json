@@ -1,0 +1,151 @@
+{
+  "_readme": "Add a device: drop its *_MODD.xml into devices/, then add an entry below. name = model name (connection suffix -M/-MQ/-MQP is ignored when matching built-ins), family = dropdown group.",
+  "version": "2026-11-17",
+  "devices": [
+    {
+      "name": "M25VTU-MQ",
+      "family": "Vibration",
+      "file": "devices/M25VTU-MQ_MODD.xml"
+    },
+    {
+      "name": "M32VTU-MQ",
+      "family": "Vibration",
+      "file": "devices/M32VTU-MQ_MODD.xml"
+    },
+    {
+      "name": "QM30VT3",
+      "family": "Vibration",
+      "file": "devices/QM30VT3_MODD.xml"
+    },
+    {
+      "name": "S25C-IEPE",
+      "family": "Vibration",
+      "file": "devices/S25C-IEPE_MODD.xml"
+    },
+    {
+      "name": "S15C-DTMS-MQ",
+      "family": "Temperature & Humidity",
+      "file": "devices/S15C-DTMS-MQ_MODD.xml"
+    },
+    {
+      "name": "S15C-RTD-MQ",
+      "family": "Temperature & Humidity",
+      "file": "devices/S15C-RTD-MQ_MODD.xml"
+    },
+    {
+      "name": "S15C-TMS-MQ",
+      "family": "Temperature & Humidity",
+      "file": "devices/S15C-TMS-MQ_MODD.xml"
+    },
+    {
+      "name": "S15S-T-MQ",
+      "family": "Temperature & Humidity",
+      "file": "devices/S15S-T-MQ_MODD.xml"
+    },
+    {
+      "name": "S15S-TH-MQ",
+      "family": "Temperature & Humidity",
+      "file": "devices/S15S-TH-MQ_MODD.xml"
+    },
+    {
+      "name": "S24AS-D-MQP",
+      "family": "Temperature & Humidity",
+      "file": "devices/S24AS-D-MQP_MODD.xml"
+    },
+    {
+      "name": "S15C-CT150-MQ",
+      "family": "Current",
+      "file": "devices/S15C-CT150-MQ_MODD.xml"
+    },
+    {
+      "name": "S15C-CT20A-MQ",
+      "family": "Current",
+      "file": "devices/S15C-CT20A-MQ_MODD.xml"
+    },
+    {
+      "name": "S15C-CT600A-MQ",
+      "family": "Current",
+      "file": "devices/S15C-CT600A-MQ_MODD.xml"
+    },
+    {
+      "name": "S15S-R500-MQ",
+      "family": "Current",
+      "file": "devices/S15S-R500-MQ_MODD.xml"
+    },
+    {
+      "name": "S15S-R1000-MQ",
+      "family": "Current",
+      "file": "devices/S15S-R1000-MQ_MODD.xml"
+    },
+    {
+      "name": "S15S-R3000-MQ",
+      "family": "Current",
+      "file": "devices/S15S-R3000-MQ_MODD.xml"
+    },
+    {
+      "name": "S15S-R6000-MQ",
+      "family": "Current",
+      "file": "devices/S15S-R6000-MQ_MODD.xml"
+    },
+    {
+      "name": "QM42-DPS20-2Q",
+      "family": "Pressure",
+      "file": "devices/QM42-DPS20-2Q_MODD.xml"
+    },
+    {
+      "name": "QM42-DPS5-2Q",
+      "family": "Pressure",
+      "file": "devices/QM42-DPS5-2Q_MODD.xml"
+    },
+    {
+      "name": "S15C-PS150C-MQ",
+      "family": "Pressure",
+      "file": "devices/S15C-PS150C-MQ_MODD.xml"
+    },
+    {
+      "name": "S15C-PS15SS-MQ",
+      "family": "Pressure",
+      "file": "devices/S15C-PS15SS-MQ_MODD.xml"
+    },
+    {
+      "name": "S15C-PS3000SS-MQ",
+      "family": "Pressure",
+      "file": "devices/S15C-PS3000SS-MQ_MODD.xml"
+    },
+    {
+      "name": "S15C-PS5000SS-MQ",
+      "family": "Pressure",
+      "file": "devices/S15C-PS5000SS-MQ_MODD.xml"
+    },
+    {
+      "name": "S15C-I-MQ",
+      "family": "Analog Input",
+      "file": "devices/S15C-I-MQ_MODD.xml"
+    },
+    {
+      "name": "S15C-U-MQ",
+      "family": "Analog Input",
+      "file": "devices/S15C-U-MQ_MODD.xml"
+    },
+    {
+      "name": "R45C-MII-IIQ",
+      "family": "Analog Input",
+      "file": "devices/R45C-MII-IIQ_MODD.xml"
+    },
+    {
+      "name": "R45C-MUU-UUQ",
+      "family": "Analog Input",
+      "file": "devices/R45C-MUU-UUQ_MODD.xml"
+    },
+    {
+      "name": "S15C-B22-MQ",
+      "family": "Discrete I/O",
+      "file": "devices/S15C-B22-MQ_MODD.xml"
+    },
+    {
+      "name": "S15CM-B22-MQ",
+      "family": "Discrete I/O",
+      "file": "devices/S15CM-B22-MQ_MODD.xml"
+    }
+  ]
+}

@@ -1,0 +1,275 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Modd xmlns="http://www.bannerengineering.com/MODD_v1.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		copyright="Copyright 2024 Banner Engineering Corp. All Rights Reserved."
+		timestamp="2026-01-05T13:03:00"
+		filename="S25C-IEPE_MQ_MODD.xml"
+		revision="1.0.0.0"
+		author="cfoster">
+
+    <icon id="iconid" Name="icon" description="image for this device" filename="nameofimage.png" />
+    <deviceids>
+        <deviceid val="819004" type="unsignedint"/>
+    </deviceids>
+
+    <deviceinfo>
+        <category cat="something" />
+        <capabilities caps="whatever" />
+        <shortdesc desc="Signal Converter IEPE" />
+        <longdesc desc="Signal Converter IEPE to Modbus; Modbus RTU Server via RS-485; M12 QD" />
+    </deviceinfo>
+
+   <settings >
+        <deviceheader>
+            <devicehdritem id="baudrate" name="Baud Rate" val="1" default="1" modbusAddr="40601" numregs="1" datatype="unsignedbyte" accessRights="rw" accesslevel="all">
+                <singlevalue val="0" text="9600"/>
+                <singlevalue val="1" text="19200"/>
+                <singlevalue val="2" text="38400"/>
+            </devicehdritem>
+            <devicehdritem id="parity" name="Parity" val="0" default="0" modbusAddr="40602" numregs="1" datatype="unsignedbyte" accessRights="rw" accesslevel="all">
+                <singlevalue val="0" text="None"/>
+                <singlevalue val="1" text="Odd"/>
+                <singlevalue val="2" text="Even"/>
+            </devicehdritem>
+            <devicehdritem id="SID" name="SID" val="1" default="1" minVal="1" maxVal="247" modbusAddr="40603" numregs="1" datatype="unsignedbyte" accessRights="rw" accesslevel="all"/>
+            <devicehdritem id="factoryreset" name="Factory Reset" val="0" default="0" modbusAddr="40605" numregs="1" datatype="unsignedbyte" accessRights="wo" accesslevel="all">
+                <singlevalue val="0" text="No Operation"/>
+                <singlevalue val="1" text="Restore"/>
+            </devicehdritem>
+            <devicehdritem id="bannername" name="Banner Name" modbusAddr="40606" numregs="10" datatype="string" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="productname" name="Product Name" modbusAddr="40616" numregs="16" datatype="string" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="itemnumber" name="Item Number" modbusAddr="40632" numregs="2" datatype="unsignedint" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="serialnumber" name="Serial Number" modbusAddr="40634" numregs="4" datatype="unsignedint" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="firmwarePN" name="Firmware PN" modbusAddr="40638" numregs="2" datatype="unsignedint" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="firmwarevers" name="Firmware Vers" modbusAddr="40640" numregs="2" datatype="unsignedint" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="firmwarebuildnum" name="Firmware Build Num" modbusAddr="40642" numregs="2" datatype="unsignedint" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="usertag" name="User Tag" modbusAddr="40644" numregs="16" datatype="string" accessRights="rw" accesslevel="all"/>
+        </deviceheader>
+    </settings>
+
+
+
+    <!--Scalar Registers-->
+    <dataitems name="Vibration Overall Scalar Registers">
+        <dataitem id="rms_vel_insec" name="RMS Vel insec" modbusAddr="40001" accessRights="ro" Description="RMS Velocity (in/sec)" units="in/sec" maxVal="65535" minVal="0" scale="0.0001" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format="decimal:2"/>
+        <dataitem id="hf_rms_accel" name="HF RMS accel" modbusAddr="40002" accessRights="ro" Description="High Frequency RMS Acceleration (G)" units="G" maxVal="65535" minVal="0" scale="0.001" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format="decimal:2"/>
+        <dataitem id="hf_accel" name="High Frequency accel" modbusAddr="40004" accessRights="ro" Description="High Frequency Peak Acceleration (G)" units="G" maxVal="65535" minVal="0" scale="0.001" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format="decimal:2"/>
+        <dataitem id="hf_crest" name="HF Crest Factor" modbusAddr="40005" accessRights="ro" Description="High Frequency Crest Factor" units="" maxVal="65535" minVal="0" scale="0.001" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format="decimal:2"/>
+        <dataitem id="kurtosis" name="Kurtosis" modbusAddr="40006" accessRights="ro" Description="High Frequency Kurtosis" units="" maxVal="65535" minVal="0" scale="0.001" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format="decimal:2"/>
+        <dataitem id="hfe_inpact_index" name="HFE Impact Index" modbusAddr="40007" accessRights="ro" Description="HFE Impact Index" units="" maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format="decimal:2"/>
+        <dataitem id="fb_band_rms_accel" name="Full Band RMS Acceleration" modbusAddr="40008" accessRights="ro" Description="Full Band RMS Acceleration (G)" units="G" maxVal="65535" minVal="0" scale="0.001" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format="decimal:2"/>
+        <dataitem id="fb_peak_to_peak_accel" name="Full Band Peak to Peak accel" modbusAddr="40009" accessRights="ro" Description="Full Band Peak to Peak Acceleration (G)" units="G" maxVal="65535" minVal="0" scale="0.001" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format="decimal:2"/> 
+        <dataitem id="fb_crest" name="Full Band Crest Factor" modbusAddr="40010" accessRights="ro" Description="Full Band Crest Factor" units="" maxVal="65535" minVal="0" scale="0.001" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format="decimal:2"/>
+        <dataitem id="fb_kurtosis" name="Full Band Kurtosis" modbusAddr="40011" accessRights="ro" Description="Full Band Kurtosis" units="" maxVal="65535" minVal="0" scale="0.001" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format="decimal:2"/>
+        <dataitem id="peak_vel_compfreq" name="Peak Vel Comp Freq" modbusAddr="40012" accessRights="ro" Description="Peak Velocity Component Frequency (Hz)" units="Hz" maxVal="65535" minVal="0" scale="0.1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format="decimal:2"/>
+        <dataitem id="full_band_peak_accel_freq" name="Full Band Peak Accel Freq" modbusAddr="40013" accessRights="ro" Description="Full Band Peak Acceleration Frequency (Hz)" units="Hz" maxVal="65535" minVal="0" scale="0.1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format="decimal:2"/>
+        <dataitem id="run_flag" name="Run Flag" modbusAddr="40014" accessRights="ro" Description="Asset Run Flag" units="Hz" maxVal="1" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="1" appliesTo="" accesslevel="all"/>
+        <dataitem id="rms_vel_mmsec" name="RMS Vel mmsec" modbusAddr="40019" accessRights="ro" Description="RMS Velocity (mm/sec)" units="mm/sec" maxVal="65535" minVal="0" scale="0.001" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format="decimal:2"/>
+        <dataitem id="hf_rms_accel" name="HF RMS accel" modbusAddr="40020" accessRights="ro" Description="High Frequency RMS Acceleration (G)" units="G" maxVal="65535" minVal="0" scale="0.001" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format="decimal:2"/>
+    </dataitems>
+
+    <!--Vibration Sampling (NV)-->
+    <dataitems name="Vibration Sampling"> 
+        <dataitem id="Run_Flag_Thr" name="Run Flag Threshold" default="1" modbusAddr="40151" accessRights="rw" Description="Run Flag Threshold Selection" units="" maxVal="1" minVal="-1" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format="decimal:3"/>   
+        <dataitem id="ISO_Asset" name="Run Flag ISO Asset Class" default="1" modbusAddr="40152" accessRights="rw" Description="Run Flag ISO Asset Class" units="" maxVal="4" minVal="1" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format="decimal:3">
+            <singlevalue val="1" text="class 1" default="true"/>
+            <singlevalue val="2" text="class 2"/>
+            <singlevalue val="3" text="class 3"/>
+            <singlevalue val="4" text="class 4"/>
+        </dataitem>
+        <dataitem id="Run_Unit" name="Run Flag Units" default="0" modbusAddr="40156" accessRights="rw" Description="Units used with Run Flag Metric/Imperial" units="" maxVal="1" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format="decimal:3">
+            <singlevalue val="0" text="Imperial" default="true"/>
+            <singlevalue val="1" text="Metric"/>
+        </dataitem>
+        <dataitem id="Piezo" name="Piezo Sensitivity" default="100" modbusAddr="40502" maxVal="65535" minVal="0" scale="1" accessRights="rw" Description="Piezo Sensitivity (mv/g)" units="mv/g" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format="decimal:3"/>
+        <dataitem id="vibe_delay" name="Vibration Measurement Delay" default="500" modbusAddr="42002" accessRights="rw" Description="Vibration Measurement Delay (sec between measurements)" units="sec" maxVal="65535" minVal="500" scale="0.001" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" format="decimal:3"/>
+        <dataitem id="Fmax" name="Max Frequency" modbusAddr="42058" maxVal="6" minVal="0" scale="1" accessRights="rw" Description="Max Frequency" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" >
+            <singlevalue val="0" text="10600 Hz"/>
+            <singlevalue val="1" text="5300 Hz"/>
+            <singlevalue val="2" text="2650 Hz"/>
+            <singlevalue val="3" text="1300 Hz"/>
+            <singlevalue val="4" text="650 Hz"/>
+            <singlevalue val="5" text="325 Hz" default="true"/>
+            <singlevalue val="6" text="163 Hz"/>
+        </dataitem>
+
+    </dataitems>   
+
+    <!--VibeIQ -->
+    <dataitems name="Vibe IQ">
+        <dataitem id="start_baseline" name="Start Baseline" modbusAddr="46001" accessRights="rw" Description="Start Baseline" maxVal="1" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="1" appliesTo="" accesslevel="all" />
+        <dataitem id="baseline_acq_status" name="Baseline Acquisition Status" modbusAddr="46002" accessRights="ro" Description="Baseline Acquisition Status" maxVal="4" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" >
+            <singlevalue val="0" text="Idle"/>
+            <singlevalue val="1" text="Start"/>
+            <singlevalue val="2" text="Samples Acquiring"/>
+            <singlevalue val="3" text="Processing"/>
+            <singlevalue val="4" text="Active"/>
+        </dataitem>
+        <dataitem id="baseline_samples_rem" name="Baseline Samples Remaining" modbusAddr="46003" accessRights="ro" Description="Baseline Samples Remaining" maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="vel_thr_compare" name="Velocity Threshold Compare" modbusAddr="46004" accessRights="rw" Description="Velocity Threshold Compare" maxVal="1" minVal="0" datatype="unsignedint" scale="1" numregs="1" bitlength="1" appliesTo="" accesslevel="all" >
+            <singlevalue val="0" text="OR" default="true"/>
+            <singlevalue val="1" text="AND"/>
+        </dataitem>
+        <dataitem id="accel_thr_compare" name="Acceleration Threshold Compare" modbusAddr="46005" accessRights="rw" Description="Acceleration Threshold Compare" maxVal="1" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="1" appliesTo="" accesslevel="all" >
+            <singlevalue val="0" text="OR" default="true"/>
+            <singlevalue val="1" text="AND"/>
+        </dataitem>
+        <dataitem id="accel_vel_orand" name="Acceleration Velocity or and" modbusAddr="46006" accessRights="rw" Description="Acceleration Velocity OR/AND Threshold Exceeded for Baseline" maxVal="1" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="1" appliesTo="" accesslevel="all" >
+            <singlevalue val="0" text="NO" default="true"/>
+            <singlevalue val="1" text="YES"/>
+        </dataitem>
+        <dataitem id="baseline_samples_tot" name="Number of Baseline Samples" default="300" modbusAddr="46007" accessRights="rw" Description="Number of Samples for Baseline" maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="baseline_samples_rate" name="Baseline Sample Rate" default="1" modbusAddr="46008" accessRights="rw" Description="Sample Rate for Baseline Samples" units="sec" maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="acute_fault_sam" name="Acute Fault Samples" default="5" modbusAddr="46009" accessRights="rw" Description="Number of Consecutive Samples for an Acute Fault"  maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="chronic_fault_sam" name="Chronic Fault Samples" default="100" modbusAddr="46010" accessRights="rw" Description="Number of Samples for a Rolling Average"  maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="units" name="Units" modbusAddr="46011" accessRights="rw" Description="Units" maxVal="1" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="1" appliesTo="" accesslevel="all" >
+            <singlevalue val="0" text="Imperial" default="true"/>
+            <singlevalue val="1" text="Metric"/>
+        </dataitem>
+        <dataitem id="z_rms_vel_run_thr" name="Z RMS Velocity Run Threshold" modbusAddr="46012" accessRights="rw" Description="Z-Axis RMS Velocity Running Threshold (Scale Dependent on 46011)"  maxVal="32768" minVal="-1" scale="1" datatype="integer" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="z_rms_hf_accel_run_thr" name="Z RMS HF Acceleration Run Threshold" modbusAddr="46013" accessRights="rw" Description="Z-Axis RMS HF Acceleration Running Threshold"  maxVal="32767" minVal="-1" scale=".001" datatype="integer" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="scalar_baseline_1" name="Scalar Baseline 1" modbusAddr="46018" accessRights="ro" Description="Scalar Baseline 1 (Scale Dependent on 46011)"  maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="scalar_baseline_2" name="Scalar Baseline 2" modbusAddr="46019" accessRights="ro" Description="Scalar Baseline 2 (Scale Dependent on 46011)"  maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="scalar_baseline_3" name="Scalar Baseline 3" modbusAddr="46020" accessRights="ro" Description="Scalar Baseline 3 (Scale Dependent on 46011)"  maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="scalar_baseline_4" name="Scalar Baseline 4" modbusAddr="46021" accessRights="ro" Description="Scalar Baseline 4 (Scale Dependent on 46011)"  maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="scalar_baseline_5" name="Scalar Baseline 5" modbusAddr="46022" accessRights="ro" Description="Scalar Baseline 5 (Scale Dependent on 46011)"  maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="scalar_baseline_6" name="Scalar Baseline 6" modbusAddr="46023" accessRights="ro" Description="Scalar Baseline 6 (Scale Dependent on 46011)"  maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="scalar_warn_thr_1" name="Scalar Warning Threshold 1" modbusAddr="46024" accessRights="rw" Description="Scalar Warning Threshold 1 (Scale Dependent on 46011)"  maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="scalar_warn_thr_2" name="Scalar Warning Threshold 2" modbusAddr="46025" accessRights="rw" Description="Scalar Warning Threshold 2 (Scale Dependent on 46011)"  maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="scalar_warn_thr_3" name="Scalar Warning Threshold 3" modbusAddr="46026" accessRights="rw" Description="Scalar Warning Threshold 3 (Scale Dependent on 46011)"  maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="scalar_warn_thr_4" name="Scalar Warning Threshold 4" modbusAddr="46027" accessRights="rw" Description="Scalar Warning Threshold 4 (Scale Dependent on 46011)"  maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="scalar_warn_thr_5" name="Scalar Warning Threshold 5" modbusAddr="46028" accessRights="rw" Description="Scalar Warning Threshold 5 (Scale Dependent on 46011)"  maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="scalar_warn_thr_6" name="Scalar Warning Threshold 6" modbusAddr="46029" accessRights="rw" Description="Scalar Warning Threshold 6 (Scale Dependent on 46011)"  maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="scalar_alarm_thr_1" name="Scalar Alarm Threshold 1" modbusAddr="46030" accessRights="rw" Description="Scalar Alarm Threshold 1 (Scale Dependent on 46011)"  maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="scalar_alarm_thr_2" name="Scalar Alarm Threshold 2" modbusAddr="46031" accessRights="rw" Description="Scalar Alarm Threshold 2 (Scale Dependent on 46011)"  maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="scalar_alarm_thr_3" name="Scalar Alarm Threshold 3" modbusAddr="46032" accessRights="rw" Description="Scalar Alarm Threshold 3 (Scale Dependent on 46011)"  maxVal="65535" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="scalar_alarm_thr_4" name="Scalar Alarm Threshold 4" modbusAddr="46033" accessRights="rw" Description="Scalar Alarm Threshold 4 (Scale Dependent on 46011)"  maxVal="65535" minVal="0" scale=".001" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="scalar_alarm_thr_5" name="Scalar Alarm Threshold 5" modbusAddr="46034" accessRights="rw" Description="Scalar Alarm Threshold 5 (Scale Dependent on 46011)"  maxVal="65535" minVal="0" scale=".001" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="scalar_alarm_thr_6" name="Scalar Alarm Threshold 6" modbusAddr="46035" accessRights="rw" Description="Scalar Alarm Threshold 6 (Scale Dependent on 46011)"  maxVal="65535" minVal="0" scale=".001" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" />
+        <dataitem id="scalar_sel_1" name="Scalar Selection 1" modbusAddr="46040" accessRights="rw" Description="Scalar Selection 1 (Scale Source Channel Dependent on 46046)"  maxVal="255" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" >
+            <singlevalue val="0" text="LF RMS Velocity (in/s)" default="true"/>
+            <singlevalue val="1" text="LF RMS Velocity (mm/s)"/>
+            <singlevalue val="3" text="HF/US Peak Acceleration (G)"/>
+            <singlevalue val="7" text="RMS Acceleration (G)"/>
+            <singlevalue val="8" text="FB Peak to Peak (G)"/>
+            <singlevalue val="255" text="None (Ignore)"/>
+        </dataitem>
+        <dataitem id="scalar_sel_2" name="Scalar Selection 2" modbusAddr="46041" accessRights="rw" Description="Scalar Selection 2 (Scale Source Channel Dependent on 46047)"  maxVal="255" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" >
+            <singlevalue val="0" text="LF RMS Velocity (in/s)"/>
+            <singlevalue val="1" text="LF RMS Velocity (mm/s)"/>
+            <singlevalue val="3" text="HF/US Peak Acceleration (G)"/>
+            <singlevalue val="7" text="RMS Acceleration (G)" default="true"/>
+            <singlevalue val="8" text="FB Peak to Peak (G)"/>
+            <singlevalue val="255" text="None (Ignore)"/>
+        </dataitem>
+        <dataitem id="scalar_sel_3" name="Scalar Selection 3" modbusAddr="46042" accessRights="rw" Description="Scalar Selection 3 (Scale Source Channel Dependent on 46048)"  maxVal="255" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" >
+            <singlevalue val="0" text="LF RMS Velocity (in/s)"/>
+            <singlevalue val="1" text="LF RMS Velocity (mm/s)"/>
+            <singlevalue val="3" text="HF/US Peak Acceleration (G)"/>
+            <singlevalue val="7" text="RMS Acceleration (G)"/>
+            <singlevalue val="8" text="FB Peak to Peak (G)"/>
+            <singlevalue val="255" text="None (Ignore)" default="true"/>
+        </dataitem>
+        <dataitem id="scalar_sel_4" name="Scalar Selection 4" modbusAddr="46043" accessRights="rw" Description="Scalar Selection 4 (Scale Source Channel Dependent on 46049)"  maxVal="255" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" >
+            <singlevalue val="0" text="LF RMS Velocity (in/s)"/>
+            <singlevalue val="1" text="LF RMS Velocity (mm/s)"/>
+            <singlevalue val="3" text="HF/US Peak Acceleration (G)"/>
+            <singlevalue val="7" text="RMS Acceleration (G)"/>
+            <singlevalue val="8" text="FB Peak to Peak (G)"/>
+            <singlevalue val="255" text="None (Ignore)" default="true"/>
+        </dataitem>
+        <dataitem id="scalar_sel_5" name="Scalar Selection 5" modbusAddr="46044" accessRights="rw" Description="Scalar Selection 5 (Scale Source Channel Dependent on 46050)"  maxVal="255" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" >
+            <singlevalue val="0" text="LF RMS Velocity (in/s)"/>
+            <singlevalue val="1" text="LF RMS Velocity (mm/s)"/>
+            <singlevalue val="3" text="HF/US Peak Acceleration (G)"/>
+            <singlevalue val="7" text="RMS Acceleration (G)"/>
+            <singlevalue val="8" text="FB Peak to Peak (G)"/>
+            <singlevalue val="255" text="None (Ignore)" default="true"/>
+        </dataitem>
+        <dataitem id="scalar_sel_6" name="Scalar Selection 6" modbusAddr="46045" accessRights="rw" Description="Scalar Selection 6 (Scale Source Channel Dependent on 46051)"  maxVal="255" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" >
+            <singlevalue val="0" text="LF RMS Velocity (in/s)"/>
+            <singlevalue val="1" text="LF RMS Velocity (mm/s)"/>
+            <singlevalue val="3" text="HF/US Peak Acceleration (G)"/>
+            <singlevalue val="7" text="RMS Acceleration (G)"/>
+            <singlevalue val="8" text="FB Peak to Peak (G)"/>
+            <singlevalue val="255" text="None (Ignore)" default="true"/>
+        </dataitem>
+        <dataitem id="scalar_chan_1" name="Scalar Source Channel 1" modbusAddr="46046" accessRights="rw" Description="Scalar Source Channel 1"  maxVal="2" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" >
+            <singlevalue val="0" text="Ultrasound"/>
+            <singlevalue val="1" text="HFE"/>
+            <singlevalue val="2" text="Full Band" default="true"/>
+        </dataitem>
+        <dataitem id="scalar_chan_2" name="Scalar Source Channel 2" modbusAddr="46047" accessRights="rw" Description="Scalar Source Channel 2"  maxVal="2" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" >
+            <singlevalue val="0" text="Ultrasound"/>
+            <singlevalue val="1" text="HFE" default="true"/>
+            <singlevalue val="2" text="Full Band"/>
+        </dataitem>
+        <dataitem id="scalar_chan_3" name="Scalar Source Channel 3" modbusAddr="46048" accessRights="rw" Description="Scalar Source Channel 3"  maxVal="2" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" >
+            <singlevalue val="0" text="Ultrasound"/>
+            <singlevalue val="1" text="HFE"/>
+            <singlevalue val="2" text="Full Band" default="true"/>
+        </dataitem>
+        <dataitem id="scalar_chan_4" name="Scalar Source Channel 4" modbusAddr="46049" accessRights="rw" Description="Scalar Source Channel 4"  maxVal="2" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" >
+            <singlevalue val="0" text="Ultrasound"/>
+            <singlevalue val="1" text="HFE"/>
+            <singlevalue val="2" text="Full Band" default="true"/>
+        </dataitem>
+        <dataitem id="scalar_chan_5" name="Scalar Source Channel 5" modbusAddr="46050" accessRights="rw" Description="Scalar Source Channel 5"  maxVal="2" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" >
+            <singlevalue val="0" text="Ultrasound"/>
+            <singlevalue val="1" text="HFE"/>
+            <singlevalue val="2" text="Full Band" default="true"/>
+        </dataitem>
+        <dataitem id="scalar_chan_6" name="Scalar Source Channel 6" modbusAddr="46051" accessRights="rw" Description="Scalar Source Channel 6"  maxVal="2" minVal="0" scale="1" datatype="unsignedint" numregs="1" bitlength="16" appliesTo="" accesslevel="all" >
+            <singlevalue val="0" text="Ultrasound"/>
+            <singlevalue val="1" text="HFE"/>
+            <singlevalue val="2" text="Full Band" default="true"/>
+        </dataitem>
+    </dataitems>
+
+
+    <uielements>
+
+			
+    </uielements>
+    
+    <demo>
+        <uielements>
+          <uielement type="graph" Title="Time vs. Velocity">
+            <xaxis Title="Time">
+                <series val="Time" />
+            </xaxis>
+            <yaxis Title="@series">
+				<series val="rms_vel_insec" rangemax="4" rangemin="0" Title="@banner-no-vary:0;Velocity RMS Velocity vs Time RMS Vel-in/sec"/>
+				<series val="hf_rms_accel" rangemax="20" rangemin="0" Title="@banner-no-vary:0;Accel HF RMS Accel vs Time HF RMS Accel-G"/>
+                <series val="ultra_rms" rangemax="65535" rangemin="0" Title="@banner-no-vary:0;Ultrasound RMS vs Time Ultrasound RMS (kHz)"/>
+            </yaxis>
+          </uielement>
+        </uielements>
+    </demo>
+
+        <!--Potential to use this for Harmonics-->
+    <!-- <datatypecollection>
+        <datatype id="Band" name="Spectral Band" type="unsignedint" bitlength="16" description="desc">
+            <singlevalue val="1"  text="1X"/>
+            <singlevalue val="2"  text="2X"/>
+            <singlevalue val="3"  text="3X"/>
+            <singlevalue val="4"  text="4X"/>
+            <singlevalue val="5"  text="5X"/>
+            <singlevalue val="6"  text="6X"/>
+            <singlevalue val="7"  text="7X"/>
+            <singlevalue val="8"  text="8X"/>
+            <singlevalue val="9"  text="9X"/>
+            <singlevalue val="10" text="10X"/>
+            <singlevalue val="11" text="11X"/>
+            <singlevalue val="12" text="12X"/>
+            <singlevalue val="13" text="13X"/>
+            <singlevalue val="14" text="14X"/>
+            <singlevalue val="15" text="15X"/>
+            <singlevalue val="16" text="16X"/>
+            <singlevalue val="17" text="17X"/>
+            <singlevalue val="18" text="18X"/>
+            <singlevalue val="19" text="19X"/>
+            <singlevalue val="20" text="20X"/>
+        </datatype>
+     </datatypecollection> -->
+</Modd>

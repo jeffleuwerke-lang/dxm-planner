@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Modd xmlns="http://www.bannerengineering.com/MODD_v1.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		copyright="Copyright 2023 Banner Engineering Corp. All Rights Reserved."
+		timestamp="2018-07-10T13:03:00"
+		filename="R45C_MUU_UUQ_MODD.xml"
+		revision="1.0.0.0"
+		author="SFoley">
+
+    <icon Name="icon" description="image for this device" filename="nameofimage.png" />
+    <deviceids> 
+        <deviceid val="814534" type="unsignedint"/>
+    </deviceids>
+
+   <settings >
+        <deviceheader>
+            <devicehdritem id="baudrate" name="Baud Rate" val="1" default="1" modbusAddr="40601" numregs="1" datatype="unsignedbyte" accessRights="rw" accesslevel="all">
+                <singlevalue val="0" text="9600" />
+                <singlevalue val="1" text="19200" />
+                <singlevalue val="2" text="38400" />
+            </devicehdritem>
+            <devicehdritem id="parity" name="Parity" val="0" default="0" modbusAddr="40602" numregs="1" datatype="unsignedbyte" accessRights="rw" accesslevel="all">
+                <singlevalue val="0" text="None" />
+                <singlevalue val="1" text="Odd" />
+                <singlevalue val="2" text="Even" />
+            </devicehdritem>
+            <devicehdritem id="SID" name="SID" val="1" default="1" minVal="1" maxVal="247" modbusAddr="40603" numregs="1" datatype="unsignedbyte" accessRights="rw" accesslevel="all"/>
+            <devicehdritem id="factoryreset" name="Factory Reset" val="0" default="0" modbusAddr="40605" numregs="1" datatype="unsignedbyte" accessRights="wo" accesslevel="all">
+                <singlevalue val="0" text="No Operation" />
+                <singlevalue val="1" text="Restore" />
+            </devicehdritem>
+            <devicehdritem id="bannername" name="Banner Name" modbusAddr="40606" numregs="10" datatype="string" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="productname" name="Product Name" modbusAddr="40616" numregs="16" datatype="string" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="itemnumber" name="Item Number" modbusAddr="40632" numregs="2" datatype="unsignedint" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="serialnumber" name="Serial Number" modbusAddr="40634" numregs="4" datatype="unsignedint" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="firmwarePN" name="Firmware PN" modbusAddr="40638" numregs="2" datatype="unsignedint" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="firmwarevers" name="Firmware Vers" modbusAddr="40640" numregs="2" datatype="unsignedint" accessRights="ro" accesslevel="all"/>
+            <devicehdritem id="firmwarebuildnum" name="Firmware Build Num" modbusAddr="40642" numregs="2" datatype="unsignedint" accessRights="ro" accesslevel="all" />
+            <devicehdritem id="usertag" name="User Tag" modbusAddr="40644" numregs="16" datatype="string" accessRights="rw" accesslevel="all"/>
+        </deviceheader>
+    </settings>
+    
+    <dataitems>
+	
+	 <!--Table 1: Analog In/Out Values-->
+	  <dataitem id="voltageinport1" name="Voltage in Port1" modbusAddr="40001" accessRights="ro" Description="Input Voltage for Port 1" endian="big" maxVal="65535" minVal="0" scale=".001" datatype="unsignedint" units="V" unitLocale="" numregs="1" bitlength="16" bitposition="0" format="decimal:2" accesslevel="all"/>
+	  <dataitem id="voltageinport2" name="Voltage in Port2" modbusAddr="40002" accessRights="ro" Description="Input Voltage for Port 2" endian="big" maxVal="65535" minVal="0" scale=".001" datatype="unsignedint" units="V" unitLocale="" numregs="1" bitlength="16" bitposition="0" format="decimal:2" accesslevel="all"/>
+	  <dataitem id="voltageoutport1" name="Voltage out Port1" modbusAddr="40003" accessRights="rw" Description="Output Voltage for Port 1" endian="big" maxVal="65535" minVal="0" scale=".001" datatype="unsignedint" units="V" unitLocale="" numregs="1" bitlength="16" bitposition="0" format="decimal:2" accesslevel="all"/>	
+	  <dataitem id="voltageoutport2" name="Voltage out Port2" modbusAddr="40004" accessRights="rw" Description="Output Voltage for Port 2" endian="big" maxVal="65535" minVal="0" scale=".001" datatype="unsignedint" units="V" unitLocale="" numregs="1" bitlength="16" bitposition="0" format="decimal:2" accesslevel="all"/>
+	  
+	
+	 <!--Table 2: Analog Out-->
+	    <dataitem id="port1OutputMirroringEnable"  name="Port 1-Output Mirroring Enable" modbusAddr="41200" Description="0= Disabled, 1= Enabled" datatype="unsignedint" bitlength="16" accessRights="rw" numregs="1" accesslevel="all" scale="1">
+			<singlevalue val="0" text="Disabled"/>
+            <singlevalue val="1" text="Enabled" default="0"/>
+        </dataitem>
+			
+	    <dataitem id="port1MirroringInputPortSelection" name="Port 1-Mirroring Input Port Selection" modbusAddr="41201" Description="0= Analog In 1, 1= Analog In 2" datatype="unsignedint" bitlength="16" accessRights="rw" numregs="1" accesslevel="all" scale="1">
+			<singlevalue val="0" text="Analog In 1"/>
+            <singlevalue val="1" text="Analog In 2" default="0"/>
+	    </dataitem>
+		
+	    <dataitem id="port2OutputMirroringEnable" name="Port 2-Output Mirroring Enable" modbusAddr="41203" Description="0= Disabled, 1= Enabled" datatype="unsignedint" bitlength="16" accessRights="rw" numregs="1" accesslevel="all" scale="1">
+			<singlevalue val="0" text="Disabled"/>
+            <singlevalue val="1" text="Enabled" default="0"/>
+		</dataitem>
+	
+	    <dataitem id="port2MirroringInputPortSelection" name="Port 2-Mirroring Input Port Selection" modbusAddr="41204" Description="0= Analog In 1, 1= Analog In 2" datatype="unsignedint" bitlength="16" accessRights="rw" numregs="1" accesslevel="all" scale="1">
+			<singlevalue val="0" text="Analog In 1"/>
+            <singlevalue val="1" text="Analog In 2" default="0"/>
+		</dataitem>
+	</dataitems>
+			
+    <uielements>
+    </uielements>
+    
+    <demo>
+        <uielements>
+            <uielement type="graph" Title="Voltage vs Time">
+                <xaxis Title="Time">
+                 <series val="time" />
+                </xaxis>
+                <yaxis Title="Voltage">
+                    <series val="voltageinport1" rangemax="11" rangemin="0"/>
+                    <series val="voltageinport2" rangemax="11" rangemin="0"/>
+                    <series val="voltageoutport1" rangemax="11" rangemin="0"/>
+                    <series val="voltageoutport2" rangemax="11" rangemin="0"/>
+                </yaxis>
+            </uielement>
+        </uielements>
+</demo>
+</Modd>
